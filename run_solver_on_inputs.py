@@ -2,6 +2,7 @@ import glob, os
 import solver
 import sys
 from time import localtime, strftime
+import pickle
 
 def getTime():
     return strftime("%Y-%m-%d %H:%M:%S", localtime())
@@ -16,15 +17,52 @@ for file in glob.glob("*.in"):
     files.append(file)
 os.chdir("../")
 
-print(getTime() + " - Started.")
+updates = {}
+try:
+    scoresFile = open('updates.obj', 'rb')
+except:
+    pickle.dump(updates, open('updates.obj', 'wb'))
+updates = pickle.load(open('updates.obj', 'rb'))
+
 if loop:
+    stored_exception = None
+
     while True:
+        sys.stdout.write(getTime() + " - Started: 0000")
+        improved = 0
         count = 0
-        for file in files:
-            res = solver.main(file)
-            if res[1]:
+        for i in range(len(files)):
+            try:
+                file = files[i]
                 count += 1
-        print(getTime() + " - Updated " + str(count) + "/" + str(len(files)) + " outputs.")
+                for _ in range(4):
+                    sys.stdout.write("\b")
+                sys.stdout.write(str(count).zfill(4))
+                sys.stdout.flush()
+                res = solver.main(file)
+                if res[1]:
+                    if res[0] not in updates:
+                        updates[res[0]] = 0
+                    updates[res[0]] += 1
+                    improved += 1
+            except KeyboardInterrupt:
+                stored_exception = sys.exc_info()
+                i -= 1
+                count -= 1
+                for _ in range(13):
+                    sys.stdout.write("\b")
+                sys.stdout.write("Interrupted - Started: 0000")
+                sys.stdout.flush()
+        for _ in range(13):
+            sys.stdout.write("\b")
+        sys.stdout.write("Updated " + str(improved) + "/" + str(len(files)) + " outputs.\n")
+        sys.stdout.flush()
+
+        if stored_exception:
+            break
+
 else:
     for file in files:
         solver.main(file)
+
+pickle.dump(updates, open('updates.obj', 'wb'))

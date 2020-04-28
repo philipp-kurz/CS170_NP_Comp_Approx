@@ -49,12 +49,13 @@ def solve(G):
     score = average_pairwise_distance(T)
     while len(leaves) > 0:
         leaf = leaves.pop()
-        newT = T.copy()
-        newT.remove_node(leaf)
-        newScore = average_pairwise_distance(newT)
-        if newScore < score:
-            score = newScore
-            T = newT
+        if T.degree(leaf) == 1:
+            newT = T.copy()
+            newT.remove_node(leaf)
+            newScore = average_pairwise_distance(newT)
+            if newScore < score:
+                score = newScore
+                T = newT
     return T
 
 # Usage: python3 solver.py test.in
