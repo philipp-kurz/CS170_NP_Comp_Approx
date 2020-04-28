@@ -40,22 +40,34 @@ def findSpanningTree(G):
 # Returns: T: networkx.Graph
 def solve(G):
     T = findSpanningTree(G)
+    node_degree = T.degree(list(T.nodes()))
+    leaves = []
+    for node in node_degree:
+        if node[1] == 1:
+            leaves.append(node[0])
+    random.shuffle(leaves)
+    score = average_pairwise_distance(T)
+    while len(leaves) > 0:
+        leaf = leaves.pop()
+        newT = T.copy()
+        newT.remove_node(leaf)
+        newScore = average_pairwise_distance(newT)
+        if newScore < score:
+            score = newScore
+            T = newT
     return T
 
 # Usage: python3 solver.py test.in
 
 def main(filename):
-    print(filename, end=": ")
+    # print(filename, end=": ")
     input_name = filename[0:-3]
-    path = str(pathlib.Path().absolute()) + "/" +  input_name + '.in'
-    name = input_name
-    if name[0:7] == "inputs/":
-        name = name[7:]
+    path = str(pathlib.Path().absolute()) + "/inputs/" +  input_name + '.in'
     G = read_input_file(path)
     T = solve(G)
     # assert is_valid_network(G, T)
     score = average_pairwise_distance(T)
-    print("Average  pairwise distance: {}".format(score))
+    # print("Average  pairwise distance: {}".format(score))
 
     scores = {}
     try:
@@ -64,16 +76,20 @@ def main(filename):
         pickle.dump(scores, open('scores.obj', 'wb'))
     scores = pickle.load(open('scores.obj', 'rb'))
 
-    if name not in scores or score < scores[name]:
-        scores[name] = score
-    if score == scores[name]:
-        print("Found better solution!")
-        output_path = str(pathlib.Path().absolute()) + "/outputs/" + name + '.out'
+    better = False
+
+    if input_name not in scores or score < scores[input_name]:
+        scores[input_name] = score
+    if score == scores[input_name]:
+        # print("Found better solution!")
+        better = True
+        output_path = str(pathlib.Path().absolute()) + "/outputs/" + input_name + '.out'
         output_path = output_path.replace("\\inputs", "")
         write_output_file(T, output_path)
-    else:
-        print("Old solution (" + str(scores[name]) + ") was better!")
+    # else:
+        # print("Old solution (" + str(scores[name]) + ") was better!")
     pickle.dump(scores, open('scores.obj', 'wb'))
+    return (input_name, better)
 
 if __name__ == '__main__':
     assert len(sys.argv) == 2
