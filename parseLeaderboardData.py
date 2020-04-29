@@ -17,7 +17,7 @@ for file, pos in position.items():
     if pos == 1:
         first += 1
         print(file, pos)
-        firstPos.add(pos)
+        firstPos.add(file)
 avg /= len(position)
 print("Average position: " + str(avg))
 print("Number of first place positions: " + str(first))

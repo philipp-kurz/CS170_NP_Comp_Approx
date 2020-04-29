@@ -27,15 +27,17 @@ firstPositions = pickle.load(open("firstPositions.obj", 'rb'))
 
 if loop:
     stored_exception = None
+    iteration = 1
 
     while True:
-        sys.stdout.write(getTime() + " - Started: 0000")
+        sys.stdout.write(str(iteration).zfill(3) + " - " + getTime() + " - Started: 0000")
+        iteration += 1
         improved = 0
         count = 0
         skipped = 0
         for i in range(len(files)):
             file = files[i]
-            if file in firstPositions:
+            if file[:-3] in firstPositions:
                 skipped += 1
                 continue
             try:
@@ -61,7 +63,7 @@ if loop:
         for _ in range(13):
             sys.stdout.write("\b")
         sys.stdout.write("Updated " + str(improved) + "/" + str(len(files)) + " outputs. Skipped "
-                         + str(skipped) + "\n")
+                         + str(skipped) + ".\n")
         sys.stdout.flush()
 
         if stored_exception:

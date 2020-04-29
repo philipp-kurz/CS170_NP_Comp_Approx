@@ -22,7 +22,7 @@ def findSpanningTree(G):
     fringe = []
     fringe.append((-1, start))
     while len(fringe) > 0:
-        edge = fringe.pop()
+        edge = fringe.pop(0)
         if not visited[edge[1]]:
             visited[edge[1]] = True
             T.add_node(edge[1])
@@ -31,6 +31,7 @@ def findSpanningTree(G):
                 T.add_edge(edge[0], edge[1], weight=weight)
 
             neighbors = list(nx.neighbors(G, edge[1]))
+            
             random.shuffle(neighbors)
             for neighbor in neighbors:
                 if not visited[neighbor]:
@@ -78,10 +79,12 @@ def main(filename):
     scores = pickle.load(open('scores.obj', 'rb'))
 
     better = False
+    first = False
 
-    if input_name not in scores or score < scores[input_name]:
+    if input_name not in scores:
+        first = True
         scores[input_name] = score
-    if score == scores[input_name]:
+    if score < scores[input_name] or first:
         # print("Found better solution!")
         better = True
         output_path = str(pathlib.Path().absolute()) + "/outputs/" + input_name + '.out'
