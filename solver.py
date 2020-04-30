@@ -210,9 +210,8 @@ def main(filename):
     path = str(pathlib.Path().absolute()) + "/inputs/" +  input_name + '.in'
     G = read_input_file(path)
     T = solve(G)
-    # assert is_valid_network(G, T)
+    assert is_valid_network(G, T)
     score = average_pairwise_distance(T)
-    # print("Average  pairwise distance: {}".format(score))
 
     scores = {}
     try:
@@ -222,21 +221,15 @@ def main(filename):
     scores = pickle.load(open('scores.obj', 'rb'))
 
     better = False
-    first = False
 
-    if input_name not in scores:
-        first = True
-        scores[input_name] = score
-    if score < scores[input_name] or first:
+    if input_name not in scores or score < scores[input_name]:
         # print("Found better solution!")
+        scores[input_name] = score
         better = True
         output_path = str(pathlib.Path().absolute()) + "/outputs/" + input_name + '.out'
-        output_path = output_path.replace("\\inputs", "")
         write_output_file(T, output_path)
-    # else:
-        # print("Old solution (" + str(scores[name]) + ") was better!")
-    pickle.dump(scores, open('scores.obj', 'wb'))
-    return (input_name, better)
+        pickle.dump(scores, open('scores.obj', 'wb'))
+    return (input_name, better, scores[input_name])
 
 if __name__ == '__main__':
     assert len(sys.argv) == 2

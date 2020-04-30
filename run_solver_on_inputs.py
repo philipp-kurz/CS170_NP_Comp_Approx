@@ -19,10 +19,11 @@ os.chdir("../")
 
 updates = {}
 try:
-    scoresFile = open('updates.obj', 'rb')
+    updates = open('updates.obj', 'rb')
 except:
     pickle.dump(updates, open('updates.obj', 'wb'))
 updates = pickle.load(open('updates.obj', 'rb'))
+scores = pickle.load(open('scores.obj', 'rb'))
 firstPositions = pickle.load(open("firstPositions.obj", 'rb'))
 
 if loop:
@@ -35,10 +36,12 @@ if loop:
         improved = 0
         count = 0
         skipped = 0
+        total = 0
         for i in range(len(files)):
             file = files[i]
             if file[:-3] in firstPositions:
                 skipped += 1
+                total += scores[file[:-3]]
                 continue
             try:
                 count += 1
@@ -47,6 +50,7 @@ if loop:
                 sys.stdout.write(str(count).zfill(4))
                 sys.stdout.flush()
                 res = solver.main(file)
+                total += res[2]
                 if res[1]:
                     if res[0] not in updates:
                         updates[res[0]] = 0
@@ -63,7 +67,7 @@ if loop:
         for _ in range(13):
             sys.stdout.write("\b")
         sys.stdout.write("Updated " + str(improved) + "/" + str(len(files)) + " outputs. Skipped "
-                         + str(skipped) + ".\n")
+                         + str(skipped) + ". Total: " + str(total) + "\n")
         sys.stdout.flush()
 
         if stored_exception:
