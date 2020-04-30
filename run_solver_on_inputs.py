@@ -39,6 +39,7 @@ if loop:
         total = 0
         for i in range(len(files)):
             file = files[i]
+            # print(file)
             if file[:-3] in firstPositions:
                 skipped += 1
                 total += scores[file[:-3]]

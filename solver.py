@@ -14,6 +14,12 @@ random.seed(datetime.now())
 def Sort_Tuple(tup, pos):
     return (sorted(tup, key=lambda x: x[pos]))
 
+def AverageEdgeCost(G, u):
+    average = 0
+    neighbors = list(nx.neighbors(G, u))
+    for neighbor in neighbors:
+        average += G.get_edge_data(u, neighbor)['weight']
+    return average / len(neighbors)
 
 def findSpanningTreeDFS(G):
     T = nx.Graph()
@@ -82,7 +88,25 @@ def findSpanningTreeBFS(G):
     T = nx.Graph()
     n = len(list(G.nodes()))
     visited = [False] * n
-    start = random.randrange(n)
+    # start = random.randrange(n)
+
+    node_degree = Sort_Tuple(G.degree(list(G.nodes())), 1)
+    max_degree_nodes = []
+    max_deg = 0
+    for node in node_degree:
+        max_deg = max(max_deg, node[1])
+    for node in node_degree:
+        if node[1] == max_deg:
+            max_degree_nodes.append(node)
+    max_deg_avg = []
+    if len(max_degree_nodes) > 1:
+        for node in max_degree_nodes:
+            max_deg_avg.append((node[0], AverageEdgeCost(G, node[0])))
+        max_deg_avg = Sort_Tuple(max_deg_avg, 1)
+        start = max_deg_avg.pop(0)[0]
+    else:
+        start = max_degree_nodes.pop()[0]
+
     fringe = []
 
     fringe.append((-1, start))
