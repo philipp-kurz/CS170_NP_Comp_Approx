@@ -87,8 +87,8 @@ def findSpanningTreeBFS(G):
 
     fringe.append((-1, start))
     while len(fringe) > 0:
-        # edge = fringe.pop(0)
-        edge = heapq.heappop(fringe)
+        edge = fringe.pop(0)
+
         if not visited[edge[1]]:
             visited[edge[1]] = True
             T.add_node(edge[1])
@@ -97,18 +97,6 @@ def findSpanningTreeBFS(G):
                 T.add_edge(edge[0], edge[1], weight=weight)
 
             neighbors = list(nx.neighbors(G, edge[1]))
-
-            # neighbors_inv_weights = []
-            # total = 0
-            # for neighbor in neighbors:
-            #     inv_weight = 1/G.get_edge_data(edge[1], edge[neighbor])['weight']
-            #     neighbors_inv_weights.append((neighbor, inv_weight))
-            #     total += inv_weight
-            # normalized_neighbor_inv_weights = []
-            # for neighbor in neighbors_inv_weights:
-            #     normalized_neighbor_inv_weights.append((neighbor[0], neighbor[1]/total))
-            # normalized_neighbor_inv_weights = sorted(normalized_neighbor_inv_weights, key=lambda x: x[1])
-
             random.shuffle(neighbors)
             for neighbor in neighbors:
                 if not visited[neighbor]:
@@ -183,7 +171,7 @@ def findSpanningTreeUCS(G):
 
 # Returns: T: networkx.Graph
 def solve(G):
-    T = findSpanningTreeUCS(G)
+    T = findSpanningTreeBFS(G)
     node_degree = T.degree(list(T.nodes()))
     leaves = []
     for node in node_degree:
