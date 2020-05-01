@@ -193,7 +193,7 @@ def solve(G):
             edge = list(G.edges(node[0]))[0]
             leaves.append((node[0], G.get_edge_data(edge[0], edge[1])['weight']))
 
-    leaves = Sort_Tuple(leaves, 1)
+    # leaves = Sort_Tuple(leaves, 1)
     random.shuffle(leaves)
     score = average_pairwise_distance(T)
     while len(leaves) > 0:
@@ -215,16 +215,16 @@ def main(filename):
     path = str(pathlib.Path().absolute()) + "/inputs/" +  input_name + '.in'
     G = read_input_file(path)
     found = False
-    degrees = G.degree(list(G.nodes()))
-    for deg in degrees:
-        if deg[1] == len(degrees) - 1:
-            edges = list(G.edges(deg[0]))
-            if len(edges) != len(degrees) - 1:
-                continue
-            found = True
-            T = nx.Graph()
-            T.add_node(deg[0])
-            break
+    # degrees = G.degree(list(G.nodes()))
+    # for deg in degrees:
+    #     if deg[1] == len(degrees) - 1:
+    #         edges = list(G.edges(deg[0]))
+    #         if len(edges) != len(degrees) - 1:
+    #             continue
+    #         found = True
+    #         T = nx.Graph()
+    #         T.add_node(deg[0])
+    #         break
 
     # print("Density: " + str(nx.density(G)))
     if not found:
