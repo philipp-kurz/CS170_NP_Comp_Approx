@@ -14,13 +14,15 @@ scores = {}
 path = str(pathlib.Path().absolute())
 count = 1
 for file in files:
-    print(str(count) + "/" + str(len(files)))
+    print(file + " " + str(count) + "/" + str(len(files)))
     count += 1
     name = file.replace(".out","")
     input =  path + "/inputs/" + name + ".in"
     output = path + "/outputs/" + name + ".out"
     G = read_input_file(input)
     T = read_output_file(output, G)
+    if not is_valid_network(G, T):
+        print(file) + " not valid"
     score = average_pairwise_distance(T)
     scores[name] = score
 
