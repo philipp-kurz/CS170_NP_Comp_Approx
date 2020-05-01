@@ -173,6 +173,16 @@ def findSpanningTreeUCS(G):
 
     return T
 
+def minDominatingSet(G):
+    S = nx.dominating_set(G)
+    T = nx.minimum_spanning_tree(G)
+    for node in list(T.nodes()):
+        if node not in S:
+            H = T.copy()
+            if nx.is_connected(H.remove_node(node)):
+                T.remove_node(node)
+    return T
+
 # Returns: T: networkx.Graph
 def solve(G):
     T = findSpanningTreeBFS(G)
@@ -182,8 +192,9 @@ def solve(G):
         if node[1] == 1:
             edge = list(G.edges(node[0]))[0]
             leaves.append((node[0], G.get_edge_data(edge[0], edge[1])['weight']))
-    # random.shuffle(leaves)
+
     leaves = Sort_Tuple(leaves, 1)
+    random.shuffle(leaves)
     score = average_pairwise_distance(T)
     while len(leaves) > 0:
         leaf = leaves.pop()[0]
@@ -203,7 +214,23 @@ def main(filename):
     input_name = filename[0:-3]
     path = str(pathlib.Path().absolute()) + "/inputs/" +  input_name + '.in'
     G = read_input_file(path)
-    T = solve(G)
+    found = False
+    degrees = G.degree(list(G.nodes()))
+    for deg in degrees:
+        if deg[1] == len(degrees) - 1:
+            edges = list(G.edges(deg[0]))
+            if len(edges) != len(degrees) - 1:
+                continue
+            found = True
+            T = nx.Graph()
+            T.add_node(deg[0])
+            break
+
+    # print("Density: " + str(nx.density(G)))
+    if not found:
+        T = solve(G)
+    # if not is_valid_network(G, T):
+    #     print(filename)
     assert is_valid_network(G, T)
     score = average_pairwise_distance(T)
 
