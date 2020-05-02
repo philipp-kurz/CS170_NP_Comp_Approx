@@ -207,6 +207,122 @@ def solve(G):
                 T = newT
     return T
 
+def solveConstructively(G):
+    nodes = list(G.nodes())
+    n = len(nodes)
+    covered = [False] * n
+    T = nx.Graph()
+
+    # Pick start
+    node_heuristic = []
+    for node in nodes:
+        span = 0
+        total_weight = 0
+        edges = list(G.edges(node))
+        for edge in edges:
+            if not covered[edge[1]]:
+                span += 1
+                total_weight += G.get_edge_data(edge[0], edge[1])['weight']
+        node_heuristic.append((node, span, total_weight/span))
+    node_dist = []
+    total = 0
+    for node in node_heuristic:
+        node_dist.append((node[0], node[1]))
+        total += node[1]
+    node_dist_normalized = []
+    for node in node_dist:
+        node_dist_normalized.append((node[0], node[1]/total))
+    node_dist_normalized = Sort_Tuple(node_dist_normalized, 1)
+    node_dist_normalized.reverse()
+    rand = random.random()
+    selection = 0
+    while rand > 0:
+        rand -= node_dist_normalized[selection][1]
+        selection += 1
+    start = node_dist_normalized[selection-1][0]
+    T.add_node(start)
+    covered[start] = True
+    u = start
+
+    while not nx.is_dominating_set(G, T.nodes()):
+        edges = list(G.edges(u))
+        nodes = []
+        T_nodes = set(T.nodes())
+        for edge in edges:
+            covered[edge[1]] = True
+            if edge[1] not in T_nodes:
+                nodes.append(edge[1])
+
+        node_heuristic = []
+        for node in nodes:
+            span = 0
+            total_weight = 0
+            edges = list(G.edges(node))
+            for edge in edges:
+                if not covered[edge[1]]:
+                    span += 1
+                    total_weight += G.get_edge_data(edge[0], edge[1])['weight']
+            if span != 0:
+                node_heuristic.append((node, span, total_weight / span))
+
+        node_dist = []
+        total = 0
+        for node in node_heuristic:
+            node_dist.append((node[0], node[1]))
+            total += node[1]
+        if total == 0:
+            u = random.choice(list(T.nodes()))
+            continue
+        node_dist_normalized = []
+        for node in node_dist:
+            node_dist_normalized.append((node[0], node[1] / total))
+        node_dist_normalized = Sort_Tuple(node_dist_normalized, 1)
+        node_dist_normalized.reverse()
+        rand = random.random()
+        selection = 0
+        while rand > 0:
+            rand -= node_dist_normalized[selection][1]
+            selection += 1
+        v = node_dist_normalized[selection-1][0]
+        T.add_node(v)
+        T.add_edge(u,v)
+        u = v
+    return T
+
+
+
+
+    a = 1
+
+
+
+
+
+
+
+
+    # T = findSpanningTreeBFS(G)
+    # node_degree = T.degree(list(T.nodes()))
+    # leaves = []
+    # for node in node_degree:
+    #     if node[1] == 1:
+    #         edge = list(G.edges(node[0]))[0]
+    #         leaves.append((node[0], G.get_edge_data(edge[0], edge[1])['weight']))
+    #
+    # # leaves = Sort_Tuple(leaves, 1)
+    # random.shuffle(leaves)
+    # score = average_pairwise_distance(T)
+    # while len(leaves) > 0:
+    #     leaf = leaves.pop()[0]
+    #     if T.degree(leaf) == 1:
+    #         newT = T.copy()
+    #         newT.remove_node(leaf)
+    #         newScore = average_pairwise_distance(newT)
+    #         if newScore < score:
+    #             score = newScore
+    #             T = newT
+    return T
+
 # Usage: python3 solver.py test.in
 
 def main(filename):
@@ -228,7 +344,7 @@ def main(filename):
 
     # print("Density: " + str(nx.density(G)))
     if not found:
-        T = solve(G)
+        T = solveConstructively(G)
     # if not is_valid_network(G, T):
     #     print(filename)
     assert is_valid_network(G, T)
