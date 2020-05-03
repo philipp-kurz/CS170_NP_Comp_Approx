@@ -186,25 +186,31 @@ def minDominatingSet(G):
 # Returns: T: networkx.Graph
 def solve(G):
     T = findSpanningTreeBFS(G)
-    node_degree = T.degree(list(T.nodes()))
-    leaves = []
-    for node in node_degree:
-        if node[1] == 1:
-            edge = list(G.edges(node[0]))[0]
-            leaves.append((node[0], G.get_edge_data(edge[0], edge[1])['weight']))
 
-    # leaves = Sort_Tuple(leaves, 1)
-    random.shuffle(leaves)
-    score = average_pairwise_distance(T)
-    while len(leaves) > 0:
-        leaf = leaves.pop()[0]
-        if T.degree(leaf) == 1:
-            newT = T.copy()
-            newT.remove_node(leaf)
-            newScore = average_pairwise_distance(newT)
-            if newScore < score:
-                score = newScore
-                T = newT
+    while True:
+        node_degree = T.degree(list(T.nodes()))
+        leaves = []
+        for node in node_degree:
+            if node[1] == 1:
+                edge = list(G.edges(node[0]))[0]
+                leaves.append((node[0], G.get_edge_data(edge[0], edge[1])['weight']))
+
+        # leaves = Sort_Tuple(leaves, 1)
+        random.shuffle(leaves)
+        score = average_pairwise_distance(T)
+        all_worse = True
+        while len(leaves) > 0:
+            leaf = leaves.pop()[0]
+            if T.degree(leaf) == 1:
+                newT = T.copy()
+                newT.remove_node(leaf)
+                newScore = average_pairwise_distance(newT)
+                if newScore < score and nx.is_dominating_set(G, newT.nodes()):
+                    all_worse = False
+                    score = newScore
+                    T = newT
+        if all_worse:
+            break
     return T
 
 def solveConstructively(G):
@@ -368,7 +374,8 @@ def main(filename):
 
     # print("Density: " + str(nx.density(G)))
     if not found:
-        T = solveConstructively(G)
+        T = solve(G)
+        # T = solveConstructively(G)
     # if not is_valid_network(G, T):
     #     print(filename)
     assert is_valid_network(G, T)
