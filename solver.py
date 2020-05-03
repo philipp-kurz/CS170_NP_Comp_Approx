@@ -287,17 +287,41 @@ def solveConstructively(G):
         T.add_node(v)
         T.add_edge(u,v)
         u = v
+
+    score = average_pairwise_distance(T)
+    T_nodes = list(T.nodes())
+    T_nodes_set = set(T_nodes)
+    pot_edges = []
+    for node in T_nodes:
+        edges = list(G.edges(node))
+        for edge in edges:
+            if edge[1] not in T_nodes_set:
+                pot_edges.append(edge)
+    random.shuffle(pot_edges)
+
+    while len(pot_edges) > 0:
+        edge = pot_edges.pop()
+        T_nodes_set = set(T.nodes())
+        if edge[0] in T_nodes_set and edge[1] in T_nodes_set:
+            continue
+        u = -1
+        if edge[0] not in T_nodes_set:
+            u = edge[0]
+        else:
+            u = edge[1]
+        newT = T.copy()
+        newT.add_node(u)
+        newT.add_edge(edge[0], edge[1])
+        newScore = average_pairwise_distance(newT)
+        if newScore < score:
+            score = newScore
+            T = newT
+            new_edges = list(G.edges(u))
+            for new_edge in new_edges:
+                if edge[1] not in T_nodes_set:
+                    pot_edges.append(new_edge)
+            random.shuffle(pot_edges)
     return T
-
-
-
-
-    a = 1
-
-
-
-
-
 
 
 
