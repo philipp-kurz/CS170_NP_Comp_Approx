@@ -270,8 +270,8 @@ def solveConstructively(G):
 
 ##################### Solver function for tree algorithms #########################
 def solve(G):
-    # T = findSpanningTreeBFS(G)
-    T = nx.minimum_spanning_tree(G)
+    T = findSpanningTreeDFS(G)
+    # T = nx.minimum_spanning_tree(G)
 
     while True:
         node_degree = T.degree(list(T.nodes()))
