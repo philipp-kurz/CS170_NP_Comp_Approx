@@ -374,7 +374,8 @@ def main(filename):
 
     # print("Density: " + str(nx.density(G)))
     if not found:
-        T = solve(G)
+        T = nx.minimum_spanning_tree(G)
+        # T = solve(G)
         # T = solveConstructively(G)
     # if not is_valid_network(G, T):
     #     print(filename)
