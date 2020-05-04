@@ -8,8 +8,7 @@ from datetime import datetime
 import pickle
 import heapq
 
-random.seed(datetime.now())
-
+##################### Helper functions ################################################
 # Function to sort the list by second item of tuple
 def Sort_Tuple(tup, pos):
     return (sorted(tup, key=lambda x: x[pos]))
@@ -21,28 +20,8 @@ def AverageEdgeCost(G, u):
         average += G.get_edge_data(u, neighbor)['weight']
     return average / len(neighbors)
 
-def findSpanningTreeDFS(G):
-    T = nx.Graph()
-    n = len(list(G.nodes()))
-    visited = [False] * n
-    start = random.randrange(n)
-    fringe = [(-1, start)]
-    while len(fringe) > 0:
-        edge = fringe.pop()
-        if not visited[edge[1]]:
-            visited[edge[1]] = True
-            T.add_node(edge[1])
-            if edge[0] > -1:
-                weight = G.get_edge_data(edge[0], edge[1])['weight']
-                T.add_edge(edge[0], edge[1], weight=weight)
-            neighbors = list(nx.neighbors(G, edge[1]))
-            random.shuffle(neighbors)
-            for neighbor in neighbors:
-                if not visited[neighbor]:
-                    fringe.append((edge[1], neighbor))
-    return T
 
-
+################### Tree finding algorithms #######################################
 def findSpanningTreeDFS(G):
     T = nx.Graph()
     n = len(list(G.nodes()))
@@ -116,7 +95,6 @@ def findSpanningTreeHeuristicDFS(G):
 
     fringe.append((-1, start))
     while len(fringe) > 0:
-        # edge = fringe.pop(0)
         edge = heapq.heappop(fringe)
         if not visited[edge[1]]:
             visited[edge[1]] = True
@@ -173,47 +151,7 @@ def findSpanningTreeUCS(G):
 
     return T
 
-def minDominatingSet(G):
-    S = nx.dominating_set(G)
-    T = nx.minimum_spanning_tree(G)
-    for node in list(T.nodes()):
-        if node not in S:
-            H = T.copy()
-            if nx.is_connected(H.remove_node(node)):
-                T.remove_node(node)
-    return T
-
-# Returns: T: networkx.Graph
-def solve(G):
-    # T = findSpanningTreeUCS(G)
-    T = nx.minimum_spanning_tree(G)
-
-    while True:
-        node_degree = T.degree(list(T.nodes()))
-        leaves = []
-        for node in node_degree:
-            if node[1] == 1:
-                edge = list(G.edges(node[0]))[0]
-                leaves.append((node[0], G.get_edge_data(edge[0], edge[1])['weight']))
-
-        # leaves = Sort_Tuple(leaves, 1)
-        random.shuffle(leaves)
-        score = average_pairwise_distance(T)
-        all_worse = True
-        while len(leaves) > 0:
-            leaf = leaves.pop()[0]
-            if T.degree(leaf) == 1:
-                newT = T.copy()
-                newT.remove_node(leaf)
-                newScore = average_pairwise_distance(newT)
-                if newScore < score and nx.is_dominating_set(G, newT.nodes()):
-                    all_worse = False
-                    score = newScore
-                    T = newT
-        if all_worse:
-            break
-    return T
-
+###################### Constructive solver ##############################################
 def solveConstructively(G):
     nodes = list(G.nodes())
     n = len(nodes)
@@ -330,34 +268,43 @@ def solveConstructively(G):
             random.shuffle(pot_edges)
     return T
 
+##################### Solver function for tree algorithms #########################
+def solve(G):
+    T = findSpanningTreeBFS(G)
+    # T = nx.minimum_spanning_tree(G)
 
+    while True:
+        node_degree = T.degree(list(T.nodes()))
+        leaves = []
+        for node in node_degree:
+            if node[1] == 1:
+                edge = list(G.edges(node[0]))[0]
+                leaves.append((node[0], G.get_edge_data(edge[0], edge[1])['weight']))
 
-    # T = findSpanningTreeBFS(G)
-    # node_degree = T.degree(list(T.nodes()))
-    # leaves = []
-    # for node in node_degree:
-    #     if node[1] == 1:
-    #         edge = list(G.edges(node[0]))[0]
-    #         leaves.append((node[0], G.get_edge_data(edge[0], edge[1])['weight']))
-    #
-    # # leaves = Sort_Tuple(leaves, 1)
-    # random.shuffle(leaves)
-    # score = average_pairwise_distance(T)
-    # while len(leaves) > 0:
-    #     leaf = leaves.pop()[0]
-    #     if T.degree(leaf) == 1:
-    #         newT = T.copy()
-    #         newT.remove_node(leaf)
-    #         newScore = average_pairwise_distance(newT)
-    #         if newScore < score:
-    #             score = newScore
-    #             T = newT
+        # leaves = Sort_Tuple(leaves, 1)
+        random.shuffle(leaves)
+        score = average_pairwise_distance(T)
+        all_worse = True
+        while len(leaves) > 0:
+            leaf = leaves.pop()[0]
+            if T.degree(leaf) == 1:
+                newT = T.copy()
+                newT.remove_node(leaf)
+                newScore = average_pairwise_distance(newT)
+                if newScore < score and nx.is_dominating_set(G, newT.nodes()):
+                    all_worse = False
+                    score = newScore
+                    T = newT
+        if all_worse:
+            break
     return T
 
-# Usage: python3 solver.py test.in
 
+##################### main function ################################################
+# Usage: python3 solver.py test.in
 def main(filename):
     # print(filename, end=": ")
+    random.seed(datetime.now())
     input_name = filename[0:-3]
     path = str(pathlib.Path().absolute()) + "/inputs/" +  input_name + '.in'
     G = read_input_file(path)
@@ -377,8 +324,7 @@ def main(filename):
     if not found:
         T = solve(G)
         # T = solveConstructively(G)
-    # if not is_valid_network(G, T):
-    #     print(filename)
+
     assert is_valid_network(G, T)
     score = average_pairwise_distance(T)
 
