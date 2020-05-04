@@ -185,7 +185,7 @@ def minDominatingSet(G):
 
 # Returns: T: networkx.Graph
 def solve(G):
-    T = findSpanningTreeBFS(G)
+    T = findSpanningTreeUCS(G)
 
     while True:
         node_degree = T.degree(list(T.nodes()))
