@@ -185,7 +185,8 @@ def minDominatingSet(G):
 
 # Returns: T: networkx.Graph
 def solve(G):
-    T = findSpanningTreeUCS(G)
+    # T = findSpanningTreeUCS(G)
+    T = nx.minimum_spanning_tree(G)
 
     while True:
         node_degree = T.degree(list(T.nodes()))
@@ -374,8 +375,7 @@ def main(filename):
 
     # print("Density: " + str(nx.density(G)))
     if not found:
-        T = nx.minimum_spanning_tree(G)
-        # T = solve(G)
+        T = solve(G)
         # T = solveConstructively(G)
     # if not is_valid_network(G, T):
     #     print(filename)
