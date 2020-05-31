@@ -3,7 +3,7 @@ Approximation algorithms to find a close to optional solution for 1000 inputs to
 
 General task was to find a tree-shaped dominating set in 1007 weighted directed graphs with up to 25, 50 and 100 vertices while minimizing the average pairwise distance between the vertices in the set.
 
-The project makes heavy use of the NetworkX python library simplify graph algorithms. Note that this was a quick and dirty implementation, aimed to get as much progress in little time during the final exam period. It also relies on quite a bit of randomization to not get stuck in the same local minimum every time, and was hence run around the clock for more than a week.
+The code was written from scratch. The project makes use of the NetworkX python library simplify graph algorithms. Note that this was a quick and dirty implementation, aimed to get as much progress in little time during the final exam period. It also relies on quite a bit of randomization to not get stuck in the same local minimum every time, and was hence run around the clock for more than a week.
 
 > You are an engineer at HorizonWireless, a telecommunications company, and the CEO has tasked you with designing
 a cell tower network which spans the major cities of the United States. You need to decide which cities to build cell
