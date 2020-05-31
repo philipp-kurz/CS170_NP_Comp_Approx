@@ -1,4 +1,4 @@
-# CS170_NP_Comp_Approx
+# Approximation for NP Complete problem (UC Berkeley CS170 final project)
 Approximation algorithms to find a close to optional solution for 1000 inputs to an NP Complete problem. Final project for CS170 - "Efficient Algorithms and Intractable Problems" at UC Berkeley during the Spring 2020 semester.
 
 General task was to find a tree-shaped dominating set in 1007 weighted directed graphs with up to 25, 50 and 100 vertices while minimizing the average pairwise distance between the vertices in the set.
